@@ -22,6 +22,63 @@ provider "aws" {
 ################################################################
 
 ################################################################
+# Defining a vpc                                               #
+################################################################
+
+resource "aws_vpc" "terraform" {
+  cidr_block       = "10.0.0.0/16"
+  tags {
+    name = "frbhackathon2018"
+  }
+}
+
+################################################################
+
+################################################################
+# Defining a security group                                    #
+################################################################
+
+resource "aws_security_group" "allow_all" {
+  name        = "allow_all"
+  description = "Allow all inbound traffic"
+  vpc_id      = "${aws_vpc.terraform.id}"
+
+  ingress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port       = 0
+    to_port         = 0
+    protocol        = "-1"
+    cidr_blocks     = ["0.0.0.0/0"]
+  }
+  tags {
+    name = "frbhackathon2018"
+  }
+}
+
+################################################################
+
+################################################################
+# Defining a subnet                                            #
+################################################################
+
+resource "aws_subnet" "main" {
+    vpc_id     = "${aws_vpc.terraform.id}"
+    cidr_block = "10.0.1.0/24"
+
+    tags {
+      name = "frbhackathon2018"
+    }
+}
+
+################################################################
+
+################################################################
 # Defining the lambda role                                     #
 ################################################################
 
@@ -47,6 +104,47 @@ EOF
 ################################################################
 
 ################################################################
+# Defining a lambda role policy                                #
+################################################################
+
+resource "aws_iam_policy" "lambda_role_policy" {
+  name        = "lambda_role_policy"
+  description = "Defines lambda role policy"
+  policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+              "logs:CreateLogGroup",
+              "logs:CreateLogStream",
+              "logs:PutLogEvents",
+              "ec2:CreateNetworkInterface",
+              "ec2:DescribeNetworkInterfaces",
+              "ec2:DeleteNetworkInterface"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+EOF
+}
+
+################################################################
+
+################################################################
+# Attaching the lambda role policy to lambda role              #
+################################################################
+
+resource "aws_iam_role_policy_attachment" "attach_to_lambda_role" {
+  role       = "${aws_iam_role.iam_for_lambda.name}"
+  policy_arn = "${aws_iam_policy.lambda_role_policy.arn}"
+}
+
+################################################################
+
+################################################################
 # Defining the AWS lambdas                                     #
 ################################################################
 
@@ -56,6 +154,12 @@ resource "aws_lambda_function" "sfn_triggerer" {
   role             = "${aws_iam_role.iam_for_lambda.arn}"
   handler          = "sfn_triggerer_tf.lambda_handler"
   runtime          = "python3.6"
+
+  vpc_config {
+          subnet_ids = ["${aws_subnet.main.id}"]
+          security_group_ids = ["${aws_security_group.allow_all.id}"]
+  }
+
   environment {
     variables = {
       foo = "bar"
