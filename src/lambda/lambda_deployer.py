@@ -13,7 +13,9 @@ from pip._internal import main as pipmain
 
 def create_activate_venv(current_folder):
         site_package_dir = os.path.join(current_folder, "site_packages")
-        pipmain(["install", "--target", site_package_dir, "mysql-connector"])
+        req_file = open(os.path.join(current_folder,'requirements.txt'))
+        for line in req_file:
+            pipmain(["install", "--target", site_package_dir, line])
 
 ##################################################################
 #       move the site_packages out of venv(move_site_packages())
