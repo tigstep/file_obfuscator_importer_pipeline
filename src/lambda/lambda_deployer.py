@@ -4,18 +4,16 @@ import os
 #import pdb
 #import pip
 #import sys
-#import virtualenv
-
+import virtualenv
+from pip._internal import main as pipmain
+#import subprocess
 ##################################################################
 #               create a virtual environment
 ##################################################################
 
-#def create_activate_venv(current_folder):
-#        venv_home = current_folder + "/.tmp_env"
-#        if not os.path.exists(self.venv_home):
-#            virtualenv.create_environment(venv_home)
-#        activate_script = os.path.join(venv_home, "bin", "activate_this.py")
-#        execfile(activate_script, dict(__file__=activate_script))
+def create_activate_venv(current_folder):
+        site_package_dir = os.path.join(current_folder, "site_packages")
+        pipmain(["install", "--target", site_package_dir, "mysql-connector"])
 
 ##################################################################
 #       move the site_packages out of venv(move_site_packages())
@@ -62,7 +60,8 @@ def remove_zip(base_dir):
 def main():
     base_dir = os.getcwd()
     func_dir = os.path.join(base_dir, 'functions')
-    for dir in next(os.walk(func_dir))[1]:
-        create_zip(base_dir, func_dir, dir)
+    #for dir in next(os.walk(func_dir))[1]:
+    create_activate_venv(os.path.join(func_dir,'data_obfuscator'))
+        #create_zip(base_dir, func_dir, dir)
         #remove_zip(base_dir)
 main()
