@@ -2,3 +2,7 @@
 .gitignore
 .idea/vcs.xml
 .idea/workspace.xml
+terraform/.terraform/
+terraform/variables.tfvars
+/terraform/terraform.tfstate
+/terraform/terraform.tfstate.backup
