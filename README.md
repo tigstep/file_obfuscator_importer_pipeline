@@ -2,9 +2,7 @@
 <h2>
   Description
 </h2>  
-<h3>
-<b>A sample file obfuscation/ingestion pipeline running on AWS with automated infrastructure deployment and execution</b>
-</h3>
+A sample file obfuscation/ingestion pipeline running on AWS with automated infrastructure deployment and execution
 <h2>
   Process
 </h2>  
