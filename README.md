@@ -1,8 +1,13 @@
 # file_obfuscator_importer_pipeline
+<h2>
+  Description
+</h2>  
 <h3>
 <b>A sample file obfuscation/ingestion pipeline running on AWS with automated infrastructure deployment and execution</b>
 </h3>
-Description
+<h2>
+  Process
+</h2>  
 <ul>
   <li>A file will be pushed to an S3 bucket from an EC2 instance</li>
   <li>S3 bucket will generate an alert which in tunr will trigger a lambda function</li>
@@ -14,7 +19,9 @@ Description
     <li><b>Notifier Lambda</b>Sends out a Success/Failure SNS notification based on the outcome of the previous states of the State Machine</li>
   </ul>
 </ul>
-Execution
+<h2>
+  Execution
+</h2>
 <ul>
   <li>Looks into /src/lambda and creates AWS Lambda Deployment Packages</li>
   <li>Deploys AWS infrastructure using the Terraform script included and the deployment packages created in previous step</li>
