@@ -9,9 +9,9 @@ Description
   <li>The lambda function in turn will kick off AWS Step Functions</li>
   <li>Inside the State Machine
   <ul>
-    <li>1</li>
-    <li>2</li>
-    <li>3</li>
+    <li><b>File Obfuscator Lambda</b> looks up in the configuration table located in RDS and based on the file name obfuscates the columns specified and writes the result to separate S3 prefix</li>
+    <li><b>Data Inserter Lambda</b> Inserts both original and obfuscated files' data into two separate RDS MySQL tables</li>
+    <li><b>Notifier Lambda</b>Sends out a Success/Failure SNS notification based on the outcome of the previous states of the State Machine</li>
   </ul>
 </ul>
 Execution
