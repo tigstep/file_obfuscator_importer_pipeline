@@ -6,6 +6,9 @@ variable "region" {}
 variable "shared_credentials_file" {}
 variable "profile" {}
 variable "sfn_triggerer_lambda_function" {}
+variable "data_obfuscator_lambda_function" {}
+variable "rds_inserter_lambda_function" {}
+variable "notifier_lambda_function" {}
 variable "rds_pass" {}
 
 data "aws_availability_zones" "all" {}
@@ -200,7 +203,7 @@ resource "aws_iam_role_policy_attachment" "attach_to_lambda_role" {
 ################################################################
 
 resource "aws_lambda_function" "sfn_triggerer" {
-  filename         = "${var.sfn_triggerer_lambda_function}"
+  filename         = "${path.module}${var.sfn_triggerer_lambda_function}"
   function_name    = "sfn_triggerer_tf"
   role             = "${aws_iam_role.iam_for_lambda.arn}"
   handler          = "sfn_triggerer_tf.lambda_handler"
@@ -209,6 +212,72 @@ resource "aws_lambda_function" "sfn_triggerer" {
   vpc_config {
           subnet_ids = ["${aws_subnet.main.id}"]
           security_group_ids = ["${aws_security_group.allow_all.id}"]
+  }
+
+  environment {
+    variables = {
+      foo = "bar"
+    }
+  }
+  tags {
+    name = "frbhackathon2018"
+  }
+}
+
+resource "aws_lambda_function" "data_obfuscator" {
+  filename         = "${path.module}${var.data_obfuscator_lambda_function}"
+  function_name    = "data_obfuscator_tf"
+  role             = "${aws_iam_role.iam_for_lambda.arn}"
+  handler          = "data_obfuscator_tf.lambda_handler"
+  runtime          = "python3.6"
+
+  vpc_config {
+    subnet_ids = ["${aws_subnet.main.id}"]
+    security_group_ids = ["${aws_security_group.allow_all.id}"]
+  }
+
+  environment {
+    variables = {
+      foo = "bar"
+    }
+  }
+  tags {
+    name = "frbhackathon2018"
+  }
+}
+
+resource "aws_lambda_function" "rds_inserter" {
+  filename         = "${path.module}${var.rds_inserter_lambda_function}"
+  function_name    = "rds_inserter_tf"
+  role             = "${aws_iam_role.iam_for_lambda.arn}"
+  handler          = "rds_inserter_tf.lambda_handler"
+  runtime          = "python3.6"
+
+  vpc_config {
+    subnet_ids = ["${aws_subnet.main.id}"]
+    security_group_ids = ["${aws_security_group.allow_all.id}"]
+  }
+
+  environment {
+    variables = {
+      foo = "bar"
+    }
+  }
+  tags {
+    name = "frbhackathon2018"
+  }
+}
+
+resource "aws_lambda_function" "notifier" {
+  filename         = "${path.module}${var.notifier_lambda_function}"
+  function_name    = "notifier_tf"
+  role             = "${aws_iam_role.iam_for_lambda.arn}"
+  handler          = "notifier_tf.lambda_handler"
+  runtime          = "python3.6"
+
+  vpc_config {
+    subnet_ids = ["${aws_subnet.main.id}"]
+    security_group_ids = ["${aws_security_group.allow_all.id}"]
   }
 
   environment {
@@ -243,7 +312,7 @@ resource "aws_s3_bucket_object" "source" {
   bucket = "${aws_s3_bucket.s3_bucket.id}"
   acl    = "private"
   key    = "source/"
-  source = "nul"
+  source = "/dev/null"
 }
 
 ################################################################

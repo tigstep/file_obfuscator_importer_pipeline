@@ -9,7 +9,7 @@ def install_reqs(current_folder):
             os.system("pip install " + line + " --target " + str(site_package_dir))
 
 def create_zip(base_dir, func_dir, dir):
-    output_dir = os.path.join(os.path.join(base_dir, 'deployment_packages'), dir)
+    output_dir = os.path.join(os.path.join(os.path.join(base_dir, '../../terraform'), 'deployment_packages'), dir)
     shutil.make_archive(output_dir, 'zip', os.path.join(func_dir, dir))
 
 def remove_site_packages(dir):
