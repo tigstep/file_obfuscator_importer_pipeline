@@ -23,4 +23,5 @@ A sample file obfuscation/ingestion pipeline that runs on AWS with automated inf
 <ul>
   <li>Looks into /src/lambda and creates AWS Lambda Deployment Packages</li>
   <li>Deploys AWS infrastructure using the Terraform script included and the deployment packages created in previous step</li>
+  <li>Creates and populates the configuration table in newly created RDS instance</li>
 </ul>
