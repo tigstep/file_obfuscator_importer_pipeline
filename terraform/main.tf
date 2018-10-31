@@ -380,5 +380,103 @@ resource "aws_db_instance" "frbhackathon2018tf" {
         name = "frbhackathon2018"
     }
 }
+################################################################
 
 ################################################################
+# adding an SNS topic                                          #
+################################################################
+
+resource "aws_sns_topic" "sns_topic" {
+  name = "frbhackathon_topic"
+}
+
+################################################################
+
+################################################################
+# adding an sfn role                                           #
+################################################################
+
+resource "aws_iam_role" "iam_for_sfn" {
+  name = "iam_for_sfn"
+  assume_role_policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+      "Service": "states.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }
+    ]
+}
+EOF
+}
+
+################################################################
+
+################################################################
+# Defining a sfn role policy                                   #
+################################################################
+
+resource "aws_iam_policy" "sfn_role_policy" {
+name        = "sfn_role_policy"
+description = "Defines an sfn role policy"
+policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Effect": "Allow",
+        "Action": [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents",
+        "ec2:CreateNetworkInterface",
+        "ec2:DescribeNetworkInterfaces",
+        "ec2:DeleteNetworkInterface"
+      ],
+      "Resource": "*"
+      }
+  ]
+}
+EOF
+}
+
+################################################################
+
+################################################################
+# Attaching the sfn role policy to lambda role                 #
+################################################################
+
+resource "aws_iam_role_policy_attachment" "attach_to_sfn_role" {
+role       = "${aws_iam_role.iam_for_sfn.name}"
+policy_arn = "${aws_iam_policy.sfn_role_policy.arn}"
+}
+
+################################################################
+
+################################################################
+# Defining the AWS state machine                               #
+################################################################
+
+resource "aws_sfn_state_machine" "sfn_state_machine" {
+name     = "frbhackathon2018_state_machine"
+role_arn = "${aws_iam_role.iam_for_sfn.arn}"
+
+definition = <<EOF
+  {
+    "Comment": "A Hello World example of the Amazon States Language using an AWS Lambda Function",
+    "StartAt": "HelloWorld",
+    "States": {
+      "HelloWorld": {
+        "Type": "Task",
+        "Resource": "${aws_lambda_function.notifier.arn}",
+        "End": true
+      }
+    }
+  }
+EOF
+}
