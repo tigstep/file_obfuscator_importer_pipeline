@@ -10,6 +10,7 @@ variable "data_obfuscator_lambda_function" {}
 variable "rds_inserter_lambda_function" {}
 variable "notifier_lambda_function" {}
 variable "rds_pass" {}
+variable "ssh_key" {}
 
 data "aws_availability_zones" "all" {}
 
@@ -448,7 +449,7 @@ EOF
 ################################################################
 
 ################################################################
-# Attaching the sfn role policy to lambda role                 #
+# Attaching the sfn role policy to sfn role                    #
 ################################################################
 
 resource "aws_iam_role_policy_attachment" "attach_to_sfn_role" {
@@ -479,4 +480,105 @@ definition = <<EOF
     }
   }
 EOF
+}
+
+################################################################
+
+################################################################
+# Defining the ec2 role                                        #
+################################################################
+
+resource "aws_iam_role" "iam_for_ec2" {
+  name = "iam_for_ec2"
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+  {
+  "Action": "sts:AssumeRole",
+  "Principal": {
+    "Service": "ec2.amazonaws.com"
+  },
+  "Effect": "Allow",
+  "Sid": ""
+  }
+  ]
+}
+EOF
+}
+
+################################################################
+
+################################################################
+# Defining a ec2 role policy                                   #
+################################################################
+
+resource "aws_iam_policy" "ec2_role_policy" {
+  name        = "ec2_role_policy"
+  description = "Defines an ec2 role policy"
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+  {
+    "Effect": "Allow",
+    "Action": [
+      "s3:*"
+    ],
+  "Resource": "*"
+  }
+  ]
+}
+EOF
+}
+
+################################################################
+
+################################################################
+# Attaching the ec2 role policy to ec2 role                    #
+################################################################
+
+resource "aws_iam_role_policy_attachment" "attach_to_ec2_role" {
+  role       = "${aws_iam_role.iam_for_ec2.name}"
+  policy_arn = "${aws_iam_policy.ec2_role_policy.arn}"
+}
+
+################################################################
+
+resource "aws_key_pair" "deployer" {
+  key_name   = "frbhackathon2018"
+  public_key = "${var.ssh_key}"
+}
+
+resource "aws_iam_instance_profile" "ec2_profile" {
+  name  = "ec2_profile"
+  roles = ["${aws_iam_role.iam_for_ec2.name}"]
+}
+
+################################################################
+# Defining aws ec2 instance                                    #
+################################################################
+
+resource "aws_instance" "ec2-instance" {
+  ami             = "ami-01beb64058d271bc4"
+  instance_type   = "t2.micro"
+  iam_instance_profile = "${aws_iam_instance_profile.ec2_profile.name}"
+  key_name        = "frbhackathon2018"
+  user_data       = <<EOF
+  "#!/bin/bash"
+  "pip install awscli --upgrade --user"
+EOF
+  tags {
+    name = "frbhackathon2018"
+  }
+}
+
+################################################################
+
+output "rds_id" {
+  value = "${aws_db_instance.frbhackathon2018tf.endpoint}"
+}
+
+output "ec2_id" {
+  value = "${aws_instance.ec2-instance.public_ip}"
 }
