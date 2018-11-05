@@ -73,26 +73,58 @@ resource "aws_security_group" "allow_all" {
 ################################################################
 
 ################################################################
-# Defining a subnets                                           #
+# Defining a subnets (1 public and 2 private                   #
 ################################################################
 
-resource "aws_subnet" "main" {
+resource "aws_subnet" "public" {
     vpc_id     = "${aws_vpc.terraform.id}"
     cidr_block = "10.0.1.0/24"
     availability_zone = "${data.aws_availability_zones.all.names[0]}"
-
     tags {
       name = "frbhackathon2018"
     }
 }
 
-resource "aws_subnet" "secondary" {
+resource "aws_subnet" "private_1" {
     vpc_id     = "${aws_vpc.terraform.id}"
     cidr_block = "10.0.2.0/24"
     availability_zone = "${data.aws_availability_zones.all.names[1]}"
     tags {
-        name = "frbhackathon2018"
+      name = "frbhackathon2018"
     }
+}
+
+resource "aws_subnet" "private_2" {
+    vpc_id     = "${aws_vpc.terraform.id}"
+    cidr_block = "10.0.3.0/24"
+    availability_zone = "${data.aws_availability_zones.all.names[1]}"
+    tags {
+      name = "frbhackathon2018"
+    }
+}
+
+################################################################
+
+################################################################
+# Defining an EIP                                              #
+################################################################
+
+resource "aws_eip" "eip" {
+  vpc      = true
+}
+
+################################################################
+
+################################################################
+# Defining an NAT Gateway                                      #
+################################################################
+
+resource "aws_nat_gateway" "nat_gw" {
+  allocation_id = "${aws_eip.eip.id}"
+  subnet_id     = "${aws_subnet.public.id}"
+  tags {
+    name = "frbhackathon2018"
+  }
 }
 
 ################################################################
@@ -101,37 +133,63 @@ resource "aws_subnet" "secondary" {
 # Defining an internet gateway                                 #
 ################################################################
 
-resource "aws_internet_gateway" "gw" {
-     vpc_id = "${aws_vpc.terraform.id}"
-
-     tags {
-        name = "frbhackathon2018"
-     }
+resource "aws_internet_gateway" "internet_gw" {
+    vpc_id = "${aws_vpc.terraform.id}"
+    tags {
+      name = "frbhackathon2018"
+    }
 }
 
+################################################################
+
+################################################################
+# Defining Routing Tables                                         #
 ################################################################
 
 resource "aws_route_table" "public-rt" {
     vpc_id = "${aws_vpc.terraform.id}"
     route {
       cidr_block = "0.0.0.0/0"
-      gateway_id = "${aws_internet_gateway.gw.id}"
+      gateway_id = "${aws_internet_gateway.internet_gw.id}"
     }
-
     tags {
-    name = "frbhackathon2018"
+      name = "frbhackathon2018"
   }
 }
 
-resource "aws_route_table_association" "public-rt-1" {
-    subnet_id = "${aws_subnet.main.id}"
+resource "aws_route_table" "private-rt" {
+    vpc_id = "${aws_vpc.terraform.id}"
+    route {
+      cidr_block = "0.0.0.0/0"
+      gateway_id = "${aws_nat_gateway.nat_gw.id}"
+    }
+    tags {
+      name = "frbhackathon2018"
+    }
+}
+
+################################################################
+
+################################################################
+# Setting the Rout Table Associations                          #
+################################################################
+
+resource "aws_route_table_association" "public-rt" {
+    subnet_id = "${aws_subnet.public.id}"
     route_table_id = "${aws_route_table.public-rt.id}"
 }
 
-resource "aws_route_table_association" "public-rt-2" {
-    subnet_id = "${aws_subnet.secondary.id}"
-    route_table_id = "${aws_route_table.public-rt.id}"
+resource "aws_route_table_association" "private-rt-1" {
+    subnet_id = "${aws_subnet.private_1.id}"
+    route_table_id = "${aws_route_table.private-rt.id}"
 }
+
+resource "aws_route_table_association" "private-rt-2" {
+    subnet_id = "${aws_subnet.private_2.id}"
+    route_table_id = "${aws_route_table.private-rt.id}"
+}
+
+################################################################
 
 ################################################################
 # Defining the lambda role                                     #
@@ -177,7 +235,8 @@ resource "aws_iam_policy" "lambda_role_policy" {
               "logs:PutLogEvents",
               "ec2:CreateNetworkInterface",
               "ec2:DescribeNetworkInterfaces",
-              "ec2:DeleteNetworkInterface"
+              "ec2:DeleteNetworkInterface",
+              "states:*"
             ],
             "Resource": "*"
         }
@@ -211,7 +270,7 @@ resource "aws_lambda_function" "sfn_triggerer" {
   runtime          = "python3.6"
 
   vpc_config {
-          subnet_ids = ["${aws_subnet.main.id}"]
+          subnet_ids = ["${aws_subnet.private_1.id}","${aws_subnet.private_2.id}"]
           security_group_ids = ["${aws_security_group.allow_all.id}"]
   }
 
@@ -233,7 +292,7 @@ resource "aws_lambda_function" "data_obfuscator" {
   runtime          = "python3.6"
 
   vpc_config {
-    subnet_ids = ["${aws_subnet.main.id}"]
+    subnet_ids = ["${aws_subnet.private_1.id}","${aws_subnet.private_2.id}"]
     security_group_ids = ["${aws_security_group.allow_all.id}"]
   }
 
@@ -255,7 +314,7 @@ resource "aws_lambda_function" "rds_inserter" {
   runtime          = "python3.6"
 
   vpc_config {
-    subnet_ids = ["${aws_subnet.main.id}"]
+    subnet_ids = ["${aws_subnet.private_1.id}","${aws_subnet.private_2.id}"]
     security_group_ids = ["${aws_security_group.allow_all.id}"]
   }
 
@@ -277,7 +336,7 @@ resource "aws_lambda_function" "notifier" {
   runtime          = "python3.6"
 
   vpc_config {
-    subnet_ids = ["${aws_subnet.main.id}"]
+    subnet_ids = ["${aws_subnet.private_1.id}","${aws_subnet.private_2.id}"]
     security_group_ids = ["${aws_security_group.allow_all.id}"]
   }
 
@@ -355,7 +414,7 @@ resource "aws_s3_bucket_notification" "bucket_notification" {
 resource "aws_db_subnet_group" "subnet_group" {
     name        = "subnet_group"
     description = "subnet group for RDS"
-    subnet_ids  = ["${aws_subnet.main.id}","${aws_subnet.secondary.id}"]
+    subnet_ids  = ["${aws_subnet.public.id}","${aws_subnet.private_1.id}","${aws_subnet.private_2.id}"]
 }
 
 ################################################################
@@ -468,17 +527,17 @@ name     = "frbhackathon2018_state_machine"
 role_arn = "${aws_iam_role.iam_for_sfn.arn}"
 
 definition = <<EOF
-  {
-    "Comment": "A Hello World example of the Amazon States Language using an AWS Lambda Function",
-    "StartAt": "HelloWorld",
-    "States": {
-      "HelloWorld": {
-        "Type": "Task",
-        "Resource": "${aws_lambda_function.notifier.arn}",
-        "End": true
-      }
+{
+  "Comment": "A Hello World example of the Amazon States Language using a Pass state",
+  "StartAt": "HelloWorld",
+  "States": {
+    "HelloWorld": {
+      "Type": "Pass",
+      "Result": "Hello World!",
+      "End": true
     }
   }
+}
 EOF
 }
 
@@ -563,6 +622,8 @@ resource "aws_instance" "ec2-instance" {
   ami             = "ami-01beb64058d271bc4"
   instance_type   = "t2.micro"
   iam_instance_profile = "${aws_iam_instance_profile.ec2_profile.name}"
+  vpc_security_group_ids=["${aws_security_group.allow_all.id}"]
+  subnet_id="${aws_subnet.public.id}"
   key_name        = "frbhackathon2018"
   user_data       = <<EOF
   "#!/bin/bash"
