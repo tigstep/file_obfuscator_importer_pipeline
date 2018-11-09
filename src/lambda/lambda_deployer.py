@@ -10,7 +10,9 @@ def install_reqs(current_folder):
 
 def create_zip(base_dir, func_dir, dir):
     output_dir = os.path.join(os.path.join(os.path.join(base_dir, '../../terraform'), 'deployment_packages'), dir)
-    shutil.make_archive(output_dir, 'zip', os.path.join(func_dir, dir))
+    lambda_dir = os.path.join(func_dir, dir)
+    shutil.copy(str(os.path.join(func_dir, dir)) + '/' + str(dir) + '.py', str(os.path.join(lambda_dir, 'site_packages')))
+    shutil.make_archive(output_dir, 'zip', os.path.join(lambda_dir, 'site_packages'))
 
 def remove_site_packages(dir):
     shutil.rmtree(dir)

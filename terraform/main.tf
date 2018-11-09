@@ -280,9 +280,9 @@ resource "aws_iam_role_policy_attachment" "attach_to_lambda_role" {
 
 resource "aws_lambda_function" "sfn_triggerer" {
   filename         = "${path.module}${var.sfn_triggerer_lambda_function}"
-  function_name    = "sfn_triggerer_tf"
+  function_name    = "sfn_triggerer"
   role             = "${aws_iam_role.iam_for_lambda.arn}"
-  handler          = "sfn_triggerer_tf.lambda_handler"
+  handler          = "sfn_triggerer.lambda_handler"
   runtime          = "python3.6"
 
   vpc_config {
@@ -302,9 +302,9 @@ resource "aws_lambda_function" "sfn_triggerer" {
 
 resource "aws_lambda_function" "data_obfuscator" {
   filename         = "${path.module}${var.data_obfuscator_lambda_function}"
-  function_name    = "data_obfuscator_tf"
+  function_name    = "data_obfuscator"
   role             = "${aws_iam_role.iam_for_lambda.arn}"
-  handler          = "data_obfuscator_tf.lambda_handler"
+  handler          = "data_obfuscator.lambda_handler"
   runtime          = "python3.6"
 
   vpc_config {
@@ -324,9 +324,9 @@ resource "aws_lambda_function" "data_obfuscator" {
 
 resource "aws_lambda_function" "rds_inserter" {
   filename         = "${path.module}${var.rds_inserter_lambda_function}"
-  function_name    = "rds_inserter_tf"
+  function_name    = "rds_inserter"
   role             = "${aws_iam_role.iam_for_lambda.arn}"
-  handler          = "rds_inserter_tf.lambda_handler"
+  handler          = "rds_inserter.lambda_handler"
   runtime          = "python3.6"
 
   vpc_config {
@@ -346,9 +346,9 @@ resource "aws_lambda_function" "rds_inserter" {
 
 resource "aws_lambda_function" "notifier" {
   filename         = "${path.module}${var.notifier_lambda_function}"
-  function_name    = "notifier_tf"
+  function_name    = "notifier"
   role             = "${aws_iam_role.iam_for_lambda.arn}"
-  handler          = "notifier_tf.lambda_handler"
+  handler          = "notifier.lambda_handler"
   runtime          = "python3.6"
 
   vpc_config {
