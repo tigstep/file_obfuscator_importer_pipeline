@@ -12,10 +12,10 @@ def lambda_handler(event, context):
         ;
     '''
     def create_connection():
-        connection = mysql.connector.connect(user='root',
-                                             password='11111111',
-                                             host='frbhackathon2018tf.cu6klmcvkstw.us-west-1.rds.amazonaws.com',
-                                             database='frbhackathon2018tf')
+        connection = mysql.connector.connect(user='user',
+                                             password='password',
+                                             host='host',
+                                             database='database')
         return connection
     def get_pii_fields():
         #conn_params = load_json()
