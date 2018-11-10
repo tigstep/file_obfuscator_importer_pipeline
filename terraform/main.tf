@@ -21,9 +21,9 @@ data "aws_availability_zones" "all" {}
 ################################################################
 
 provider "aws" {
-region="${var.region}"
-shared_credentials_file="${var.shared_credentials_file}"
-profile="${var.profile}"
+  region                  = "${var.region}"
+  shared_credentials_file = "${var.shared_credentials_file}"
+  profile                 = "${var.profile}"
 }
 
 ################################################################
@@ -33,11 +33,12 @@ profile="${var.profile}"
 ################################################################
 
 resource "aws_vpc" "terraform" {
-cidr_block       = "10.0.0.0/16"
-enable_dns_hostnames = true
-tags {
-name = "frbhackathon2018"
-}
+  cidr_block           = "10.0.0.0/16"
+  enable_dns_hostnames = true
+
+  tags {
+    name = "frbhackathon2018"
+  }
 }
 
 ################################################################
@@ -47,26 +48,27 @@ name = "frbhackathon2018"
 ################################################################
 
 resource "aws_security_group" "allow_all" {
-name        = "allow_all"
-description = "Allow all inbound traffic"
-vpc_id      = "${aws_vpc.terraform.id}"
+  name        = "allow_all"
+  description = "Allow all inbound traffic"
+  vpc_id      = "${aws_vpc.terraform.id}"
 
-ingress {
-from_port   = 0
-to_port     = 0
-protocol    = "-1"
-cidr_blocks = ["0.0.0.0/0"]
-}
+  ingress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 
-egress {
-from_port       = 0
-to_port         = 0
-protocol        = "-1"
-cidr_blocks     = ["0.0.0.0/0"]
-}
-tags {
-name = "frbhackathon2018"
-}
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags {
+    name = "frbhackathon2018"
+  }
 }
 
 ################################################################
@@ -76,41 +78,45 @@ name = "frbhackathon2018"
 ################################################################
 
 resource "aws_subnet" "public_1" {
-vpc_id     = "${aws_vpc.terraform.id}"
-cidr_block = "10.0.1.0/24"
-availability_zone = "${data.aws_availability_zones.all.names[0]}"
-map_public_ip_on_launch = true
-tags {
-name = "frbhackathon2018"
-}
+  vpc_id                  = "${aws_vpc.terraform.id}"
+  cidr_block              = "10.0.1.0/24"
+  availability_zone       = "${data.aws_availability_zones.all.names[0]}"
+  map_public_ip_on_launch = true
+
+  tags {
+    name = "frbhackathon2018"
+  }
 }
 
 resource "aws_subnet" "public_2" {
-vpc_id     = "${aws_vpc.terraform.id}"
-cidr_block = "10.0.2.0/24"
-availability_zone = "${data.aws_availability_zones.all.names[1]}"
-map_public_ip_on_launch = true
-tags {
-name = "frbhackathon2018"
-}
+  vpc_id                  = "${aws_vpc.terraform.id}"
+  cidr_block              = "10.0.2.0/24"
+  availability_zone       = "${data.aws_availability_zones.all.names[1]}"
+  map_public_ip_on_launch = true
+
+  tags {
+    name = "frbhackathon2018"
+  }
 }
 
 resource "aws_subnet" "private_1" {
-vpc_id     = "${aws_vpc.terraform.id}"
-cidr_block = "10.0.3.0/24"
-availability_zone = "${data.aws_availability_zones.all.names[0]}"
-tags {
-name = "frbhackathon2018"
-}
+  vpc_id            = "${aws_vpc.terraform.id}"
+  cidr_block        = "10.0.3.0/24"
+  availability_zone = "${data.aws_availability_zones.all.names[0]}"
+
+  tags {
+    name = "frbhackathon2018"
+  }
 }
 
 resource "aws_subnet" "private_2" {
-vpc_id     = "${aws_vpc.terraform.id}"
-cidr_block = "10.0.4.0/24"
-availability_zone = "${data.aws_availability_zones.all.names[1]}"
-tags {
-name = "frbhackathon2018"
-}
+  vpc_id            = "${aws_vpc.terraform.id}"
+  cidr_block        = "10.0.4.0/24"
+  availability_zone = "${data.aws_availability_zones.all.names[1]}"
+
+  tags {
+    name = "frbhackathon2018"
+  }
 }
 
 ################################################################
@@ -120,7 +126,7 @@ name = "frbhackathon2018"
 ################################################################
 
 resource "aws_eip" "eip" {
-vpc      = true
+  vpc = true
 }
 
 ################################################################
@@ -130,11 +136,12 @@ vpc      = true
 ################################################################
 
 resource "aws_nat_gateway" "nat_gw" {
-allocation_id = "${aws_eip.eip.id}"
-subnet_id     = "${aws_subnet.public_1.id}"
-tags {
-name = "frbhackathon2018"
-}
+  allocation_id = "${aws_eip.eip.id}"
+  subnet_id     = "${aws_subnet.public_1.id}"
+
+  tags {
+    name = "frbhackathon2018"
+  }
 }
 
 ################################################################
@@ -144,10 +151,11 @@ name = "frbhackathon2018"
 ################################################################
 
 resource "aws_internet_gateway" "internet_gw" {
-vpc_id = "${aws_vpc.terraform.id}"
-tags {
-name = "frbhackathon2018"
-}
+  vpc_id = "${aws_vpc.terraform.id}"
+
+  tags {
+    name = "frbhackathon2018"
+  }
 }
 
 ################################################################
@@ -157,25 +165,29 @@ name = "frbhackathon2018"
 ################################################################
 
 resource "aws_route_table" "public-rt" {
-vpc_id = "${aws_vpc.terraform.id}"
-route {
-cidr_block = "0.0.0.0/0"
-gateway_id = "${aws_internet_gateway.internet_gw.id}"
-}
-tags {
-name = "frbhackathon2018"
-}
+  vpc_id = "${aws_vpc.terraform.id}"
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = "${aws_internet_gateway.internet_gw.id}"
+  }
+
+  tags {
+    name = "frbhackathon2018"
+  }
 }
 
 resource "aws_route_table" "private-rt" {
-vpc_id = "${aws_vpc.terraform.id}"
-route {
-cidr_block = "0.0.0.0/0"
-gateway_id = "${aws_nat_gateway.nat_gw.id}"
-}
-tags {
-name = "frbhackathon2018"
-}
+  vpc_id = "${aws_vpc.terraform.id}"
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = "${aws_nat_gateway.nat_gw.id}"
+  }
+
+  tags {
+    name = "frbhackathon2018"
+  }
 }
 
 ################################################################
@@ -185,23 +197,23 @@ name = "frbhackathon2018"
 ################################################################
 
 resource "aws_route_table_association" "public-rt-1" {
-subnet_id = "${aws_subnet.public_1.id}"
-route_table_id = "${aws_route_table.public-rt.id}"
+  subnet_id      = "${aws_subnet.public_1.id}"
+  route_table_id = "${aws_route_table.public-rt.id}"
 }
 
 resource "aws_route_table_association" "public-rt-2" {
-subnet_id = "${aws_subnet.public_2.id}"
-route_table_id = "${aws_route_table.public-rt.id}"
+  subnet_id      = "${aws_subnet.public_2.id}"
+  route_table_id = "${aws_route_table.public-rt.id}"
 }
 
 resource "aws_route_table_association" "private-rt-1" {
-subnet_id = "${aws_subnet.private_1.id}"
-route_table_id = "${aws_route_table.private-rt.id}"
+  subnet_id      = "${aws_subnet.private_1.id}"
+  route_table_id = "${aws_route_table.private-rt.id}"
 }
 
 resource "aws_route_table_association" "private-rt-2" {
-subnet_id = "${aws_subnet.private_2.id}"
-route_table_id = "${aws_route_table.private-rt.id}"
+  subnet_id      = "${aws_subnet.private_2.id}"
+  route_table_id = "${aws_route_table.private-rt.id}"
 }
 
 ################################################################
@@ -211,8 +223,9 @@ route_table_id = "${aws_route_table.private-rt.id}"
 ################################################################
 
 resource "aws_iam_role" "iam_for_lambda" {
-name = "iam_for_lambda"
-assume_role_policy = <<EOF
+  name = "iam_for_lambda"
+
+  assume_role_policy = <<EOF
 {
 "Version": "2012-10-17",
 "Statement": [
@@ -236,9 +249,10 @@ EOF
 ################################################################
 
 resource "aws_iam_policy" "lambda_role_policy" {
-name        = "lambda_role_policy"
-description = "Defines lambda role policy"
-policy = <<EOF
+  name        = "lambda_role_policy"
+  description = "Defines lambda role policy"
+
+  policy = <<EOF
 {
 "Version": "2012-10-17",
 "Statement": [
@@ -268,8 +282,8 @@ EOF
 ################################################################
 
 resource "aws_iam_role_policy_attachment" "attach_to_lambda_role" {
-role       = "${aws_iam_role.iam_for_lambda.name}"
-policy_arn = "${aws_iam_policy.lambda_role_policy.arn}"
+  role       = "${aws_iam_role.iam_for_lambda.name}"
+  policy_arn = "${aws_iam_policy.lambda_role_policy.arn}"
 }
 
 ################################################################
@@ -279,11 +293,12 @@ policy_arn = "${aws_iam_policy.lambda_role_policy.arn}"
 ################################################################
 
 resource "aws_s3_bucket" "s3_bucket" {
-bucket = "frbhackathon2018tf"
-acl    = "private"
-tags {
-name = "frbhackathon2018"
-}
+  bucket = "frbhackathon2018tf"
+  acl    = "private"
+
+  tags {
+    name = "frbhackathon2018"
+  }
 }
 
 ################################################################
@@ -293,10 +308,10 @@ name = "frbhackathon2018"
 ################################################################
 
 resource "aws_s3_bucket_object" "source" {
-bucket = "${aws_s3_bucket.s3_bucket.id}"
-acl    = "private"
-key    = "source/"
-source = "/dev/null"
+  bucket = "${aws_s3_bucket.s3_bucket.id}"
+  acl    = "private"
+  key    = "source/"
+  source = "/dev/null"
 }
 
 ################################################################
@@ -306,11 +321,11 @@ source = "/dev/null"
 ################################################################
 
 resource "aws_lambda_permission" "allow_bucket" {
-statement_id  = "AllowExecutionFromS3Bucket"
-action        = "lambda:InvokeFunction"
-function_name = "${aws_lambda_function.sfn_triggerer.arn}"
-principal     = "s3.amazonaws.com"
-source_arn    = "${aws_s3_bucket.s3_bucket.arn}"
+  statement_id  = "AllowExecutionFromS3Bucket"
+  action        = "lambda:InvokeFunction"
+  function_name = "${aws_lambda_function.sfn_triggerer.arn}"
+  principal     = "s3.amazonaws.com"
+  source_arn    = "${aws_s3_bucket.s3_bucket.arn}"
 }
 
 ################################################################
@@ -320,13 +335,13 @@ source_arn    = "${aws_s3_bucket.s3_bucket.arn}"
 ################################################################
 
 resource "aws_s3_bucket_notification" "bucket_notification" {
-bucket = "${aws_s3_bucket.s3_bucket.id}"
+  bucket = "${aws_s3_bucket.s3_bucket.id}"
 
-lambda_function {
-lambda_function_arn = "${aws_lambda_function.sfn_triggerer.arn}"
-events              = ["s3:ObjectCreated:*"]
-filter_prefix       = "source/"
-}
+  lambda_function {
+    lambda_function_arn = "${aws_lambda_function.sfn_triggerer.arn}"
+    events              = ["s3:ObjectCreated:*"]
+    filter_prefix       = "source/"
+  }
 }
 
 ################################################################
@@ -336,9 +351,9 @@ filter_prefix       = "source/"
 ################################################################
 
 resource "aws_db_subnet_group" "subnet_group" {
-name        = "subnet_group"
-description = "subnet group for RDS"
-subnet_ids  = ["${aws_subnet.public_1.id}", "${aws_subnet.public_2.id}"]
+  name        = "subnet_group"
+  description = "subnet group for RDS"
+  subnet_ids  = ["${aws_subnet.public_1.id}", "${aws_subnet.public_2.id}"]
 }
 
 ################################################################
@@ -346,24 +361,26 @@ subnet_ids  = ["${aws_subnet.public_1.id}", "${aws_subnet.public_2.id}"]
 ################################################################
 
 resource "aws_db_instance" "frbhackathon2018tf" {
-allocated_storage    = 10
-identifier           = "frbhackathon2018tf"
-storage_type         = "gp2"
-engine               = "mysql"
-engine_version       = "5.7.23"
-instance_class       = "db.t2.micro"
-name                 = "frbhackathon2018tf"
-username             = "root"
-password             = "${var.rds_pass}"
-parameter_group_name = "default.mysql5.7"
-publicly_accessible  = true
-vpc_security_group_ids = ["${aws_security_group.allow_all.id}"]
-db_subnet_group_name   = "${aws_db_subnet_group.subnet_group.id}"
-skip_final_snapshot = true
-tags {
-name = "frbhackathon2018"
+  allocated_storage      = 10
+  identifier             = "frbhackathon2018tf"
+  storage_type           = "gp2"
+  engine                 = "mysql"
+  engine_version         = "5.7.23"
+  instance_class         = "db.t2.micro"
+  name                   = "frbhackathon2018tf"
+  username               = "root"
+  password               = "${var.rds_pass}"
+  parameter_group_name   = "default.mysql5.7"
+  publicly_accessible    = true
+  vpc_security_group_ids = ["${aws_security_group.allow_all.id}"]
+  db_subnet_group_name   = "${aws_db_subnet_group.subnet_group.id}"
+  skip_final_snapshot    = true
+
+  tags {
+    name = "frbhackathon2018"
+  }
 }
-}
+
 ################################################################
 
 ################################################################
@@ -371,7 +388,7 @@ name = "frbhackathon2018"
 ################################################################
 
 resource "aws_sns_topic" "sns_topic" {
-name = "frbhackathon_topic"
+  name = "frbhackathon_topic"
 }
 
 ################################################################
@@ -381,8 +398,9 @@ name = "frbhackathon_topic"
 ################################################################
 
 resource "aws_iam_role" "iam_for_sfn" {
-name = "iam_for_sfn"
-assume_role_policy = <<EOF
+  name = "iam_for_sfn"
+
+  assume_role_policy = <<EOF
 {
 "Version": "2012-10-17",
 "Statement": [
@@ -406,9 +424,10 @@ EOF
 ################################################################
 
 resource "aws_iam_policy" "sfn_role_policy" {
-name        = "sfn_role_policy"
-description = "Defines an sfn role policy"
-policy = <<EOF
+  name        = "sfn_role_policy"
+  description = "Defines an sfn role policy"
+
+  policy = <<EOF
 {
 "Version": "2012-10-17",
 "Statement": [
@@ -437,8 +456,8 @@ EOF
 ################################################################
 
 resource "aws_iam_role_policy_attachment" "attach_to_sfn_role" {
-role       = "${aws_iam_role.iam_for_sfn.name}"
-policy_arn = "${aws_iam_policy.sfn_role_policy.arn}"
+  role       = "${aws_iam_role.iam_for_sfn.name}"
+  policy_arn = "${aws_iam_policy.sfn_role_policy.arn}"
 }
 
 ################################################################
@@ -448,10 +467,10 @@ policy_arn = "${aws_iam_policy.sfn_role_policy.arn}"
 ################################################################
 
 resource "aws_sfn_state_machine" "sfn_state_machine" {
-name     = "frbhackathon2018_state_machine"
-role_arn = "${aws_iam_role.iam_for_sfn.arn}"
+  name     = "frbhackathon2018_state_machine"
+  role_arn = "${aws_iam_role.iam_for_sfn.arn}"
 
-definition = <<EOF
+  definition = <<EOF
 {
 "Comment": "A Catch example of the Amazon States Language using an AWS Lambda function",
 "StartAt": "FileObfuscator",
@@ -486,8 +505,9 @@ EOF
 ################################################################
 
 resource "aws_iam_role" "iam_for_ec2" {
-name = "iam_for_ec2"
-assume_role_policy = <<EOF
+  name = "iam_for_ec2"
+
+  assume_role_policy = <<EOF
 {
 "Version": "2012-10-17",
 "Statement": [
@@ -511,9 +531,10 @@ EOF
 ################################################################
 
 resource "aws_iam_policy" "ec2_role_policy" {
-name        = "ec2_role_policy"
-description = "Defines an ec2 role policy"
-policy = <<EOF
+  name        = "ec2_role_policy"
+  description = "Defines an ec2 role policy"
+
+  policy = <<EOF
 {
 "Version": "2012-10-17",
 "Statement": [
@@ -536,20 +557,20 @@ EOF
 ################################################################
 
 resource "aws_iam_role_policy_attachment" "attach_to_ec2_role" {
-role       = "${aws_iam_role.iam_for_ec2.name}"
-policy_arn = "${aws_iam_policy.ec2_role_policy.arn}"
+  role       = "${aws_iam_role.iam_for_ec2.name}"
+  policy_arn = "${aws_iam_policy.ec2_role_policy.arn}"
 }
 
 ################################################################
 
 resource "aws_key_pair" "deployer" {
-key_name   = "frbhackathon2018"
-public_key = "${var.ssh_key}"
+  key_name   = "frbhackathon2018"
+  public_key = "${var.ssh_key}"
 }
 
 resource "aws_iam_instance_profile" "ec2_profile" {
-name  = "ec2_profile"
-roles = ["${aws_iam_role.iam_for_ec2.name}"]
+  name  = "ec2_profile"
+  roles = ["${aws_iam_role.iam_for_ec2.name}"]
 }
 
 ################################################################
@@ -557,19 +578,21 @@ roles = ["${aws_iam_role.iam_for_ec2.name}"]
 ################################################################
 
 resource "aws_instance" "ec2-instance" {
-ami             = "ami-01beb64058d271bc4"
-instance_type   = "t2.micro"
-iam_instance_profile = "${aws_iam_instance_profile.ec2_profile.name}"
-vpc_security_group_ids=["${aws_security_group.allow_all.id}"]
-subnet_id="${aws_subnet.public_1.id}"
-key_name        = "frbhackathon2018"
-user_data       = <<EOF
+  ami                    = "ami-01beb64058d271bc4"
+  instance_type          = "t2.micro"
+  iam_instance_profile   = "${aws_iam_instance_profile.ec2_profile.name}"
+  vpc_security_group_ids = ["${aws_security_group.allow_all.id}"]
+  subnet_id              = "${aws_subnet.public_1.id}"
+  key_name               = "frbhackathon2018"
+
+  user_data = <<EOF
 "#!/bin/bash"
 "pip install awscli --upgrade --user"
 EOF
-tags {
-name = "frbhackathon2018"
-}
+
+  tags {
+    name = "frbhackathon2018"
+  }
 }
 
 ################################################################
@@ -579,108 +602,115 @@ name = "frbhackathon2018"
 ################################################################
 
 resource "aws_lambda_function" "sfn_triggerer" {
-filename         = "${path.module}${var.sfn_triggerer_lambda_function}"
-function_name    = "sfn_triggerer"
-role             = "${aws_iam_role.iam_for_lambda.arn}"
-handler          = "sfn_triggerer.lambda_handler"
-runtime          = "python3.6"
+  filename      = "${path.module}${var.sfn_triggerer_lambda_function}"
+  function_name = "sfn_triggerer"
+  role          = "${aws_iam_role.iam_for_lambda.arn}"
+  handler       = "sfn_triggerer.lambda_handler"
+  runtime       = "python3.6"
 
-vpc_config {
-subnet_ids = ["${aws_subnet.private_1.id}", "${aws_subnet.private_2.id}"]
-security_group_ids = ["${aws_security_group.allow_all.id}"]
-}
+  vpc_config {
+    subnet_ids         = ["${aws_subnet.private_1.id}", "${aws_subnet.private_2.id}"]
+    security_group_ids = ["${aws_security_group.allow_all.id}"]
+  }
 
-environment {
-variables = {
-sfn_arn = "${aws_sfn_state_machine.sfn_state_machine.id}"
-}
-}
-tags {
-name = "frbhackathon2018"
-}
+  environment {
+    variables = {
+      sfn_arn = "${aws_sfn_state_machine.sfn_state_machine.id}"
+    }
+  }
+
+  tags {
+    name = "frbhackathon2018"
+  }
 }
 
 resource "aws_lambda_function" "data_obfuscator" {
-filename         = "${path.module}${var.data_obfuscator_lambda_function}"
-function_name    = "data_obfuscator"
-role             = "${aws_iam_role.iam_for_lambda.arn}"
-handler          = "data_obfuscator.lambda_handler"
-runtime          = "python3.6"
+  filename      = "${path.module}${var.data_obfuscator_lambda_function}"
+  function_name = "data_obfuscator"
+  role          = "${aws_iam_role.iam_for_lambda.arn}"
+  handler       = "data_obfuscator.lambda_handler"
+  runtime       = "python3.6"
 
-vpc_config {
-subnet_ids = ["${aws_subnet.private_1.id}", "${aws_subnet.private_2.id}"]
-security_group_ids = ["${aws_security_group.allow_all.id}"]
-}
+  vpc_config {
+    subnet_ids         = ["${aws_subnet.private_1.id}", "${aws_subnet.private_2.id}"]
+    security_group_ids = ["${aws_security_group.allow_all.id}"]
+  }
 
-environment {
-variables = {
-endpoint = "${aws_db_instance.frbhackathon2018tf.endpoint}"
-user = "${aws_db_instance.frbhackathon2018tf.username}"
-password = "${aws_db_instance.frbhackathon2018tf.password}"
-}
-}
-tags {
-name = "frbhackathon2018"
-}
+  environment {
+    variables = {
+      endpoint = "${aws_db_instance.frbhackathon2018tf.endpoint}"
+      user     = "${aws_db_instance.frbhackathon2018tf.username}"
+      password = "${aws_db_instance.frbhackathon2018tf.password}"
+    }
+  }
+
+  tags {
+    name = "frbhackathon2018"
+  }
 }
 
 resource "aws_lambda_function" "rds_inserter" {
-filename         = "${path.module}${var.rds_inserter_lambda_function}"
-function_name    = "rds_inserter"
-role             = "${aws_iam_role.iam_for_lambda.arn}"
-handler          = "rds_inserter.lambda_handler"
-runtime          = "python3.6"
+  filename      = "${path.module}${var.rds_inserter_lambda_function}"
+  function_name = "rds_inserter"
+  role          = "${aws_iam_role.iam_for_lambda.arn}"
+  handler       = "rds_inserter.lambda_handler"
+  runtime       = "python3.6"
 
-vpc_config {
-subnet_ids = ["${aws_subnet.private_1.id}", "${aws_subnet.private_2.id}"]
-security_group_ids = ["${aws_security_group.allow_all.id}"]
-}
+  vpc_config {
+    subnet_ids         = ["${aws_subnet.private_1.id}", "${aws_subnet.private_2.id}"]
+    security_group_ids = ["${aws_security_group.allow_all.id}"]
+  }
 
-environment {
-variables = {
-endpoint = "${aws_db_instance.frbhackathon2018tf.endpoint}"
-user = "${aws_db_instance.frbhackathon2018tf.username}"
-password = "${aws_db_instance.frbhackathon2018tf.password}"
-}
-}
-tags {
-name = "frbhackathon2018"
-}
+  environment {
+    variables = {
+      endpoint = "${aws_db_instance.frbhackathon2018tf.endpoint}"
+      user     = "${aws_db_instance.frbhackathon2018tf.username}"
+      password = "${aws_db_instance.frbhackathon2018tf.password}"
+    }
+  }
+
+  tags {
+    name = "frbhackathon2018"
+  }
 }
 
 resource "aws_lambda_function" "notifier" {
-filename         = "${path.module}${var.notifier_lambda_function}"
-function_name    = "notifier"
-role             = "${aws_iam_role.iam_for_lambda.arn}"
-handler          = "notifier.lambda_handler"
-runtime          = "python3.6"
+  filename      = "${path.module}${var.notifier_lambda_function}"
+  function_name = "notifier"
+  role          = "${aws_iam_role.iam_for_lambda.arn}"
+  handler       = "notifier.lambda_handler"
+  runtime       = "python3.6"
 
-vpc_config {
-subnet_ids = ["${aws_subnet.private_1.id}", "${aws_subnet.private_2.id}"]
-security_group_ids = ["${aws_security_group.allow_all.id}"]
-}
+  vpc_config {
+    subnet_ids         = ["${aws_subnet.private_1.id}", "${aws_subnet.private_2.id}"]
+    security_group_ids = ["${aws_security_group.allow_all.id}"]
+  }
 
-environment {
-variables = {
-foo = "bar"
-}
-}
-tags {
-name = "frbhackathon2018"
-}
+  environment {
+    variables = {
+      foo = "bar"
+    }
+  }
+
+  tags {
+    name = "frbhackathon2018"
+  }
 }
 
 ################################################################
 
 output "rds_endpoint" {
-value = "${aws_db_instance.frbhackathon2018tf.endpoint}"
+  value = "${aws_db_instance.frbhackathon2018tf.endpoint}"
 }
+
 output "rds_username" {
-value = "${aws_db_instance.frbhackathon2018tf.username}"
+  value = "${aws_db_instance.frbhackathon2018tf.username}"
 }
+
 output "rds_password" {
-value = "${aws_db_instance.frbhackathon2018tf.password}"
+  value = "${aws_db_instance.frbhackathon2018tf.password}"
 }
+
 output "ec2_id" {
-value = "${aws_instance.ec2-instance.public_ip}"
+  value = "${aws_instance.ec2-instance.public_ip}"
 }
