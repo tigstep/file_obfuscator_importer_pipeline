@@ -1,6 +1,7 @@
 import json
 import boto3
 import time
+import os
 
 def lambda_handler(event, context):
     client = boto3.client("sts")
@@ -8,8 +9,9 @@ def lambda_handler(event, context):
     client = boto3.client('stepfunctions')
     ts = time.time()
     response = client.start_execution(
-        stateMachineArn='arn:aws:states:us-west-1:' + account_id + ':stateMachine:frbhackathon2018_state_machine'
-        ,name='frbhackathon2018_state_machine' + str(ts),input='{}'
+        stateMachineArn=os.environ['sfn_arn']
+        ,name='frbhackathon2018_state_machine' + str(ts)
+        ,input=str(event).replace('\'','\"')
     )
     return {
         "statusCode": 200,
