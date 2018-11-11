@@ -1,3 +1,4 @@
+import json
 import os
 import boto3
 import mysql.connector
@@ -78,5 +79,10 @@ def lambda_handler(event, context):
         obfs_key = 'obfs/' + file_name
         s3 = boto3.resource('s3')
         obfuscate_file(s3, bucket_name, source_key, obfs_key, file_name)
+        output_dict = {}
+        output_dict["bucket_name"] = bucket_name
+        output_dict["list_of_files"] = [source_key, obfs_key]
+        return json.dumps(output_dict)
 
-    main()
+    return_json = main()
+    return return_json
