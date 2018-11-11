@@ -478,6 +478,17 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
 "FileObfuscator": {
 "Type": "Task",
 "Resource": "${aws_lambda_function.data_obfuscator.arn}",
+"Next": "RDSInserter",
+"Catch": [
+{
+"ErrorEquals": ["States.ALL"],
+"Next": "Notifier"
+}
+]
+},
+"RDSInserter": {
+"Type": "Task",
+"Resource": "${aws_lambda_function.rds_inserter.arn}",
 "End": true,
 "Catch": [
 {

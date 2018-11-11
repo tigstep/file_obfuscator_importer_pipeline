@@ -4,10 +4,10 @@ import json
 
 def lambda_handler(event, context):
     def extract_bucket_name(event):
-        return 'frbhackathon2018tf'
+        return json.loads(event)['bucket_name']
 
     def extract_file_names(event):
-        return ['source/CustLoan.txt', 'obfs/CustLoan.txt']
+        return json.loads(event)['list_of_files']
 
     def download_file_from_s3(s3, bucket_name, key):
         s3.Bucket(bucket_name).download_file(key, '/tmp/test.txt')
