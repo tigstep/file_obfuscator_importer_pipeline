@@ -65,7 +65,7 @@ def lambda_handler(event, context):
             for line in file:
                 line_arr = line.split(',')
                 for index in index_arr:
-                    line_arr[index] = '########'
+                    line_arr[index] = '\'########\''
                 obfs_file.write(','.join(line_arr))
         obfs_file.close()
         upload_obfs_to_s3(s3, bucket_name, obfs_file_name, obfs_key)
