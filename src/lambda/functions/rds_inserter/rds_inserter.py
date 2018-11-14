@@ -23,6 +23,7 @@ def lambda_handler(event, context):
 
     def insert_into_rds(s3, conn, bucket_name, file_names):
         cursor = conn.cursor()
+        cursor.execute('SET autocommit=1;')
         for file in file_names:
             if 'obfs' in file:
                 table_name = 'T_CUST_LOAN_OBFS'
