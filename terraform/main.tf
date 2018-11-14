@@ -266,7 +266,8 @@ resource "aws_iam_policy" "lambda_role_policy" {
 "ec2:DescribeNetworkInterfaces",
 "ec2:DeleteNetworkInterface",
 "states:*",
-"s3:*"
+"s3:*",
+"sns:*"
 ],
 "Resource": "*"
 }
@@ -489,7 +490,7 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
 "RDSInserter": {
 "Type": "Task",
 "Resource": "${aws_lambda_function.rds_inserter.arn}",
-"End": true,
+"Next": "Notifier",
 "Catch": [
 {
 "ErrorEquals": ["States.ALL"],
@@ -498,9 +499,15 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
 ]
 },
 "Notifier": {
-"Type": "Pass",
-"Result": "Failure!",
-"End": true
+"Type": "Task",
+"Resource": "${aws_lambda_function.notifier.arn}",
+"End": true,
+"Catch": [
+{
+"ErrorEquals": ["States.ALL"],
+"Next": "Notifier"
+}
+]
 }
 }
 }
@@ -699,7 +706,7 @@ resource "aws_lambda_function" "notifier" {
 
   environment {
     variables = {
-      foo = "bar"
+      topic_arn = "${aws_sns_topic.sns_topic.arn}"
     }
   }
 

@@ -46,5 +46,10 @@ def lambda_handler(event, context):
         bucket_name = extract_bucket_name(event)
         conn = create_connection()
         insert_into_rds(s3, conn, bucket_name, file_names)
+        output_dict = {}
+        output_dict["result"] = "success"
+        output_dict["key"] = file_names[0]
+        return json.dumps(output_dict)
 
-    main()
+    return_json = main()
+    return return_json
