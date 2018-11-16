@@ -37,7 +37,7 @@ resource "aws_vpc" "terraform" {
   enable_dns_hostnames = true
 
   tags {
-    name = "frbhackathon2018"
+    name = "frbhackathon2018tf"
   }
 }
 
@@ -67,7 +67,7 @@ resource "aws_security_group" "allow_all" {
   }
 
   tags {
-    name = "frbhackathon2018"
+    name = "frbhackathon2018tf"
   }
 }
 
@@ -84,7 +84,7 @@ resource "aws_subnet" "public_1" {
   map_public_ip_on_launch = true
 
   tags {
-    name = "frbhackathon2018"
+    name = "frbhackathon2018tf"
   }
 }
 
@@ -95,7 +95,7 @@ resource "aws_subnet" "public_2" {
   map_public_ip_on_launch = true
 
   tags {
-    name = "frbhackathon2018"
+    name = "frbhackathon2018tf"
   }
 }
 
@@ -105,7 +105,7 @@ resource "aws_subnet" "private_1" {
   availability_zone = "${data.aws_availability_zones.all.names[0]}"
 
   tags {
-    name = "frbhackathon2018"
+    name = "frbhackathon2018tf"
   }
 }
 
@@ -115,7 +115,7 @@ resource "aws_subnet" "private_2" {
   availability_zone = "${data.aws_availability_zones.all.names[1]}"
 
   tags {
-    name = "frbhackathon2018"
+    name = "frbhackathon2018tf"
   }
 }
 
@@ -140,7 +140,7 @@ resource "aws_nat_gateway" "nat_gw" {
   subnet_id     = "${aws_subnet.public_1.id}"
 
   tags {
-    name = "frbhackathon2018"
+    name = "frbhackathon2018tf"
   }
 }
 
@@ -154,7 +154,7 @@ resource "aws_internet_gateway" "internet_gw" {
   vpc_id = "${aws_vpc.terraform.id}"
 
   tags {
-    name = "frbhackathon2018"
+    name = "frbhackathon2018tf"
   }
 }
 
@@ -173,7 +173,7 @@ resource "aws_route_table" "public-rt" {
   }
 
   tags {
-    name = "frbhackathon2018"
+    name = "frbhackathon2018tf"
   }
 }
 
@@ -186,7 +186,7 @@ resource "aws_route_table" "private-rt" {
   }
 
   tags {
-    name = "frbhackathon2018"
+    name = "frbhackathon2018tf"
   }
 }
 
@@ -298,7 +298,7 @@ resource "aws_s3_bucket" "s3_bucket" {
   acl    = "private"
 
   tags {
-    name = "frbhackathon2018"
+    name = "frbhackathon2018tf"
   }
 }
 
@@ -378,7 +378,7 @@ resource "aws_db_instance" "frbhackathon2018tf" {
   skip_final_snapshot    = true
 
   tags {
-    name = "frbhackathon2018"
+    name = "frbhackathon2018tf"
   }
 }
 
@@ -609,7 +609,7 @@ resource "aws_instance" "ec2-instance" {
 EOF
 
   tags {
-    name = "frbhackathon2018"
+    name = "frbhackathon2018tf"
   }
 }
 
@@ -638,7 +638,7 @@ resource "aws_lambda_function" "sfn_triggerer" {
   }
 
   tags {
-    name = "frbhackathon2018"
+    name = "frbhackathon2018tf"
   }
 }
 
@@ -663,7 +663,7 @@ resource "aws_lambda_function" "data_obfuscator" {
   }
 
   tags {
-    name = "frbhackathon2018"
+    name = "frbhackathon2018tf"
   }
 }
 
@@ -688,7 +688,7 @@ resource "aws_lambda_function" "rds_inserter" {
   }
 
   tags {
-    name = "frbhackathon2018"
+    name = "frbhackathon2018tf"
   }
 }
 
@@ -711,7 +711,7 @@ resource "aws_lambda_function" "notifier" {
   }
 
   tags {
-    name = "frbhackathon2018"
+    name = "frbhackathon2018tf"
   }
 }
 
