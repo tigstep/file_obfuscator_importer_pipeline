@@ -4,7 +4,7 @@
 </h2>  
 A sample file obfuscation/ingestion pipeline that runs on AWS with automated infrastructure deployment and execution
 <h2>
-  Process
+  Process Description
 </h2>  
 <ul>
   <li>A file is put to an S3 bucket from an EC2 instance</li>
@@ -21,13 +21,13 @@ A sample file obfuscation/ingestion pipeline that runs on AWS with automated inf
 </h2>
 In order to execute run <B>wrapper.py</b> script
 <h2>
-  Execution process explained
+  Execution Process Description
 </h2>
 <ul>
   <li><b>wrapper.py</b> executes three scripts in sequence
   <ul>  
-    <li><b>lambda_deployer.py</b>: Looks into /src/lambda and creates AWS Lambda Deployment Packages</li>
-    <li><b>terraform apply</b>: Deploys AWS infrastructure using the Terraform script included and the deployment packages created during the previous step</li>
-    <li><b>sql_executor.py</b>: Creates and populates the configuration table in the RDS instance, created during the terraform apply step</li>
+    <li><b>lambda_deployer.py</b> - Looks into /src/lambda and creates AWS Lambda Deployment Packages</li>
+    <li><b>terraform apply</b> - Deploys AWS infrastructure using the Terraform script included and the deployment packages created during the previous step</li>
+    <li><b>sql_executor.py</b> - Creates and populates the configuration table in the RDS instance, created during the terraform apply step</li>
   </ul>
 </ul>
