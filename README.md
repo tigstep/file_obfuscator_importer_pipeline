@@ -13,7 +13,7 @@ A sample file obfuscation/ingestion pipeline that runs on AWS with automated inf
   <ul>
     <li><b>File Obfuscator Lambda</b> queries the configuration table (created as part of the <b>terraform apply</b>), extracts the column names for the given file name that need to be obfuscated, obfuscates the columns in the source file and writes the result to a separate S3 prefix</li>
     <li>Next <b>rds_inserter</b> lambda inserts both original and obfuscated files into two separate RDS MySQL tables</li>
-    <li>Next <b>notifier</b> lambda publishes a Success/Failure SNS notification to its topic, based on the outcome of the previous states of the State Machine</li>. The published notifications at this point is available for future consumption.
+    <li>Next <b>notifier</b> lambda publishes a Success/Failure SNS notification to its topic, based on the outcome of the previous states of the State Machine. The published notifications at this point is available for future consumption.</li>
   </ul>
 </ul>
 <h2>
