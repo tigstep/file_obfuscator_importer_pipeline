@@ -1,6 +1,6 @@
 # file_obfuscator_importer_pipeline
 <h2>
-  Description
+  Short Description
 </h2>  
 A sample file obfuscation/ingestion pipeline that runs on AWS with automated infrastructure deployment and execution
 <h2>
