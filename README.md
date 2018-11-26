@@ -31,3 +31,10 @@ In order to execute run <B>wrapper.py</b> script
     <li><b>sql_executor.py</b> - Creates and populates the configuration table in the RDS instance, created during the terraform apply step</li>
   </ul>
 </ul>
+<h2>
+  To Do
+</h2>
+<ul>
+  <li>Implement better logging</li>
+  <li>Use Redis for configuration lookup</li>
+</ul>  
