@@ -36,5 +36,5 @@ In order to execute run <B>wrapper.py</b> script
 </h2>
 <ul>
   <li>Implement better logging</li>
-  <li>Use Redis for configuration lookup</li>
+  <li>Use Redis for configuration lookup instead of MySQL</li>
 </ul>  
