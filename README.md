@@ -1,12 +1,27 @@
-# file_obfuscator_importer_pipeline using (ec2, s3, lambda, rds mysql, step functions, sns) 
+# file_obfuscator_importer_pipeline
 <h2>
   Requirements
 </h2>
-Requires Terraform, python3 and an AWS account.
+Requires Terraform, Python3 and an AWS account.
+<h2>
+  Tools/Services Used
+</h2>
+  <ul>
+  <li>Python3</li>
+  <li>Terraform</li>
+  <li>AWS</li>
+    <ul>
+      <li>EC2</li>
+      <li>S3</li>
+      <li>Lambda</li>
+      <li>RDS</li>
+      <li>Step Functions</li>
+      <li>SNS</li>
+  </ul>
 <h2>
   Short Description
 </h2>  
-A sample file obfuscation/ingestion pipeline that runs on AWS with automated infrastructure deployment and execution
+A simple file obfuscation/ingestion pipeline that runs on AWS with automated infrastructure deployment and execution
 <h2>
   Process Description
 </h2>  
@@ -30,7 +45,7 @@ In order to execute run <B>wrapper.py</b> script
 <ul>
   <li><b>wrapper.py</b> executes three scripts in sequence
   <ul>  
-    <li><b>lambda_deployer.py</b> - Looks into /src/lambda and creates AWS Lambda Deployment Packages</li>
+    <li><b>lambda_deployer.py</b> - Looks into <b>/src/lambda</b> and creates AWS Lambda Deployment Packages</li>
     <li><b>terraform apply</b> - Deploys AWS infrastructure using the Terraform script included and the deployment packages created during the previous step</li>
     <li><b>sql_executor.py</b> - Creates and populates the configuration table in the RDS instance, created during the terraform apply step</li>
   </ul>
