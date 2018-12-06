@@ -1,5 +1,9 @@
 # file_obfuscator_importer_pipeline using (ec2, s3, lambda, rds mysql, step functions, sns) 
 <h2>
+  Requirements
+</h2>
+Requires Terraform, python3 and an AWS account.
+<h2>
   Short Description
 </h2>  
 A sample file obfuscation/ingestion pipeline that runs on AWS with automated infrastructure deployment and execution
