@@ -61,4 +61,5 @@ In order to execute run <B>wrapper.py</b> script
 <ul>
   <li>Implement better logging</li>
   <li>Use Redis for configuration lookup instead of MySQL</li>
+  <li>Improve the security by making NACLs and SGs stricter</li>
 </ul>  
