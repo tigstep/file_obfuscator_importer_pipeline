@@ -1,5 +1,10 @@
 # file_obfuscator_importer_pipeline
 <h2>
+  Diagram
+</h2>
+
+![alt text](https://github.com/tigstep/file_obfuscator_importer_pipeline/blob/master/diagrams/diagram.jpg)
+<h2>
   Requirements
 </h2>
 Requires Terraform, Python3 and an AWS account.
