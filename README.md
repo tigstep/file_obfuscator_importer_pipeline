@@ -22,6 +22,7 @@ Requires Terraform, Python3 and an AWS account.
       <li>RDS</li>
       <li>Step Functions</li>
       <li>SNS</li>
+    </ul>
   </ul>
 <h2>
   Short Description
@@ -62,4 +63,10 @@ In order to execute run <B>wrapper.py</b> script
   <li>Implement better logging</li>
   <li>Use Redis for configuration lookup instead of MySQL</li>
   <li>Improve the security by making NACLs and SGs stricter</li>
-</ul>  
+</ul>
+<h2>
+  Warnings
+</h2>
+<ul>
+  <li>Current configuration of this project will be using AWS services that are beyond the Free Tier!</li>
+</ul>
