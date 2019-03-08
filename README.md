@@ -7,7 +7,7 @@
 <h2>
   Requirements
 </h2>
-Requires Terraform, Python3 and an AWS account.
+This project requires Terraform, Python3 and an AWS account.
 <h2>
   Tools/Services Used
 </h2>
